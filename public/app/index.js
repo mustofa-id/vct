@@ -1,34 +1,35 @@
 // @ts-check
 
 function app() {
-	const ffmpeg = new FFmpegWASM.FFmpeg();
-	const timeout = 15000; // seconds
+	const ffmpeg = FFmpeg.createFFmpeg({
+		corePath: new URL("/ext/ffmpeg-core.js", location.toString()).href,
+		log: true,
+	});
 
 	const input_el = /** @type {HTMLInputElement} */ (document.getElementById("input-source"));
 	const video_el = /** @type {HTMLVideoElement} */ (document.getElementById("video-result"));
 	const log_el = /** @type {HTMLPreElement} */ (document.getElementById("logs"));
 
 	let /** @type {string | undefined} */ result_url;
+	let loaded = false;
 
 	async function init() {
-		if (ffmpeg.loaded) {
+		if (loaded) {
 			log("already loaded");
 			return;
 		}
 
 		log("initializing...");
 		try {
-			await ffmpeg.load({
-				coreURL: "/app/ffmpeg-core.js",
-				wasmURL: "/app/ffmpeg-core.wasm",
+			ffmpeg.setLogger(({ message }) => {
+				log(message);
 			});
 
-			ffmpeg.on("log", ({ type, message }) => {
-				log(`${type}: ${message}`);
-			});
+			await ffmpeg.load();
 
 			input_el.onchange = transcode;
 			log("initialized");
+			loaded = true;
 		} catch (error) {
 			log("init error:", error);
 		}
@@ -44,15 +45,15 @@ function app() {
 
 			log(`preparing file "${input}"...`);
 			const buffer = await file.arrayBuffer();
-			await ffmpeg.writeFile(`/${input}`, new Uint8Array(buffer));
+			ffmpeg.FS("writeFile", `/${input}`, new Uint8Array(buffer));
 
-			const command = `-i ${input} ${output}`;
+			const command = `-i ${input} -vf scale=-2:1920,fps=30 -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k ${output}`;
 			log(`exec: "ffmpeg ${command}"`);
-			const code = await ffmpeg.exec(command.split(" "), timeout);
-			if (code != 0) throw new Error("return " + code);
+
+			await ffmpeg.run(...command.split(" "));
 
 			log(`reading result file "${output}"...`);
-			const data = await ffmpeg.readFile(output);
+			const data = ffmpeg.FS("readFile", output);
 
 			if (result_url) URL.revokeObjectURL(result_url);
 			result_url = URL.createObjectURL(new Blob([data], { type: "video/mp4" }));
@@ -67,10 +68,12 @@ function app() {
 
 	async function cleanup(/** @type {string[]} */ ...files) {
 		log("cleaning up...");
-		for (const file of files) {
-			ffmpeg.deleteFile(file).catch((e) => {
-				console.warn("failed to delete file:", file, e);
-			});
+		try {
+			for (const file of files) {
+				ffmpeg.FS("unlink", file);
+			}
+		} catch (error) {
+			console.warn("failed to delete files:", error);
 		}
 	}
 
@@ -79,7 +82,7 @@ function app() {
 	 * @param {Error | any =} error
 	 */
 	function log(message, error) {
-		console[error ? "error" : "log"](message, error || "");
+		if (error) console.error(error);
 		const line = document.createElement("span");
 		line.textContent = message + " " + (error || "") + "\n";
 		if (error) line.style.color = "red";

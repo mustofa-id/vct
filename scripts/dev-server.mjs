@@ -64,7 +64,11 @@ const server = http.createServer((req, res) => {
 				</script>
 				`;
 			}
-			res.writeHead(200, { "Content-Type": content_type });
+			res.writeHead(200, {
+				"Content-Type": content_type,
+				"Cross-Origin-Embedder-Policy": "require-corp",
+				"Cross-Origin-Opener-Policy": "same-origin",
+			});
 			res.end(content, "utf8");
 		}
 	});

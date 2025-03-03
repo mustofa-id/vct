@@ -1,7 +1,5 @@
-export { };
+export {};
 
 declare global {
-	const FFmpegWASM: {
-		FFmpeg: typeof import("@ffmpeg/ffmpeg").FFmpeg;
-	};
+	const FFmpeg: typeof import("@ffmpeg/ffmpeg");
 }

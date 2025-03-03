@@ -1,11 +1,15 @@
-import { existsSync, promises } from "node:fs";
+import { existsSync, mkdirSync, promises } from "node:fs";
 import { join, resolve } from "node:path";
 
 async function copy_ffmpeg_libs() {
 	console.log("prepare ffmpeg libs...");
-	const source_modules = ["/core/dist/umd", "/ffmpeg/dist/umd"];
-	const target_dir = resolve("public/app");
+	const source_modules = ["/core/dist", "/ffmpeg/dist"];
+	const target_dir = resolve("public/ext");
 	try {
+		if (!existsSync(target_dir)) {
+			mkdirSync(target_dir);
+		}
+
 		for (const source of source_modules) {
 			const source_dir = resolve(`node_modules/@ffmpeg/${source}`);
 			const files = await promises.readdir(source_dir);
