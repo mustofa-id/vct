@@ -28,4 +28,32 @@ async function copy_ffmpeg_libs() {
 	}
 }
 
-copy_ffmpeg_libs();
+async function gen_vercel_headers() {
+	console.log("vercel env:", process.env.VERCEL);
+	if (!process.env.VERCEL) return;
+	const file = "vercel.json";
+	const data = JSON.stringify({
+		headers: [
+			{
+				source: "/(.*)",
+				headers: [
+					{
+						key: "Cross-Origin-Embedder-Policy",
+						value: "require-corp",
+					},
+					{
+						key: "Cross-Origin-Opener-Policy",
+						value: "same-origin",
+					},
+				],
+			},
+		],
+	});
+	await promises.writeFile(file, data);
+	console.log(`${file} created`);
+}
+
+await Promise.all([
+	copy_ffmpeg_libs(), //
+	gen_vercel_headers(),
+]);

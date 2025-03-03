@@ -7,9 +7,19 @@
 		<title>VCT</title>
 	</head>
 	<body>
-		<input id="input-source" type="file" />
-		<video id="video-result" controls></video>
-		<pre id="logs"></pre>
+		<section style="display: flex; justify-content: space-between">
+			<input id="input-source" type="file" />
+			<em id="loading" hidden>Processing...</em>
+		</section>
+
+		<section>
+			<video id="video-result" controls></video>
+		</section>
+
+		<details open>
+			<summary></summary>
+			<pre id="logs"></pre>
+		</details>
 
 		<script src="/ext/ffmpeg.min.js"></script>
 		<script src="/app/index.js"></script>

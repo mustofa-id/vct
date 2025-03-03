@@ -24,3 +24,13 @@ pre#logs {
 pre#logs span {
 	margin: 0.25rem;
 }
+
+details[open] summary::before {
+	content: "Hide logs";
+	color: dimgrey;
+}
+
+details:not([open]) summary::before {
+	content: "See logs";
+	color: chocolate;
+}
