@@ -1,0 +1,21 @@
+{
+	"name": "vct",
+	"version": "0.0.1",
+	"description": "Offline video compressor tools",
+	"scripts": {
+		"dev": "node scripts/dev-server.mjs",
+		"postinstall": "node scripts/post-install.mjs"
+	},
+	"keywords": [
+		"video-compressor",
+		"ffmpeg",
+		"wasm"
+	],
+	"author": "Habib Mustofa <25121822+mustofa-id@users.noreply.github.com>",
+	"license": "MIT",
+	"packageManager": "pnpm@10.5.2",
+	"devDependencies": {
+		"@ffmpeg/core": "^0.12.10",
+		"@ffmpeg/ffmpeg": "^0.12.15"
+	}
+}

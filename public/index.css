@@ -1,0 +1,26 @@
+body {
+	max-width: 36rem;
+}
+
+input#input-source {
+	display: flex;
+	width: 100%;
+}
+
+video#video-result {
+	width: 100%;
+	margin-top: 0.5rem;
+}
+
+pre#logs {
+	overflow: auto;
+	width: 100%;
+	max-height: 24rem;
+	background-color: antiquewhite;
+	padding: 0.25rem 0 0.25rem 0;
+	margin-top: 0.25rem;
+}
+
+pre#logs span {
+	margin: 0.25rem;
+}
