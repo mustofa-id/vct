@@ -2,11 +2,11 @@ import { existsSync, mkdirSync, promises } from "node:fs";
 import { join, resolve } from "node:path";
 
 const ext_files = new Set();
-const target_dir = resolve("public/ext");
 
 async function copy_ffmpeg_libs() {
 	console.log("prepare ffmpeg libs...");
 	const source_modules = ["/core/dist", "/ffmpeg/dist"];
+	const target_dir = resolve("public/ext");
 
 	try {
 		if (!existsSync(target_dir)) {
@@ -36,7 +36,7 @@ async function copy_ffmpeg_libs() {
 
 async function gen_sw_file() {
 	console.log("generating service worker file...");
-	const file = join(target_dir, "sw.js");
+	const file = join(resolve("public"), "sw.js");
 	const script = `const ext_files = ${JSON.stringify([...ext_files], null, 2)};
 self.addEventListener("install", (event) => {
 	event.waitUntil(
